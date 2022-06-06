@@ -1,5 +1,5 @@
 """
-Train vanilla GAN with 102 Category Flower Dataset.
+Train conditional GAN with 102 Category Flower Dataset.
 """
 
 import argparse
@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from torch import nn
-from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torchvision import utils
 
@@ -22,9 +21,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data-path', type=str, default='data/102flowers')
     parser.add_argument('--img-size', type=int, default=64)
-    parser.add_argument('--input-dim', type=int, default=100, help='number of dimensions of generator input vector')
+    parser.add_argument('--input-dim', type=int, default=64, help='number of dimensions of generator input vector')
     parser.add_argument('--batch-size', type=int, default=128)
-    parser.add_argument('--embedding-dim', type=int, default=128, help='number of dimensions of embedding vector')
+    parser.add_argument('--embedding-dim', type=int, default=32, help='number of dimensions of embedding vector')
     parser.add_argument('--noise-factor', type=float, default=0.5, help='factor to scale added noise')
     parser.add_argument('--lr', type=float, default=0.0002, help='learning rate')
     parser.add_argument('--beta1', type=float, default=0.5, help='Adam optimizer beta1')
@@ -42,8 +41,9 @@ def main():
     optimizer_generator = torch.optim.Adam(generator.parameters(), lr=args.lr, betas=(args.beta1, 0.999))
     optimizer_discriminator = torch.optim.Adam(discriminator.parameters(), lr=args.lr, betas=(args.beta1, 0.999))
 
-    fixed_random_noise = torch.randn(64, args.input_dim, 1, 1, device=device)
-    fixed_random_labels = torch.randperm(102).long()[:64].to(device)
+    fixed_random_noise = torch.randn(64, args.input_dim, device=device)
+    fixed_random_labels = torch.randperm(102).long()[:8].to(device)
+    fixed_random_labels = fixed_random_labels.repeat(8)
 
     print('start training')
     criterion = nn.BCELoss()
