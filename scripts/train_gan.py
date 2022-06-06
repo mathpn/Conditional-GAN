@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from torch import nn
-from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torchvision import utils
 
@@ -56,26 +55,23 @@ def main():
 
             # train discriminator
             discriminator.zero_grad()
-            real_loss = criterion(
-                discriminator(x).view(-1), 
-                torch.ones_like(discriminator(x)).view(-1)
-            )
+            real_out = discriminator(x).view(-1)
+            real_loss = criterion(real_out, torch.ones_like(real_out))
             real_loss.backward()
             disc_loss_obj += real_loss.item()
 
             random_noise = torch.randn(x.shape[0], args.input_dim).to(device)
             fake = generator(random_noise)
-            fake_loss = criterion(
-                discriminator(fake.detach()).view(-1),
-                torch.zeros_like(discriminator(fake.detach())).view(-1)
-            )
+            fake_out = discriminator(fake.detach()).view(-1)
+            fake_loss = criterion(fake_out, torch.zeros_like(fake_out))
             fake_loss.backward()
             disc_loss_obj += fake_loss.item()
             optimizer_discriminator.step()
 
             # train generator
             generator.zero_grad()
-            gen_loss = criterion(discriminator(fake).view(-1), torch.ones_like(discriminator(fake)).view(-1))
+            fake_out = discriminator(fake).view(-1)
+            gen_loss = criterion(fake_out, torch.ones_like(fake_out))
             gen_loss.backward()
             gen_loss_obj += gen_loss.item()
             optimizer_generator.step()
