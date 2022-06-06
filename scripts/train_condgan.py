@@ -25,6 +25,7 @@ def main():
     parser.add_argument('--input-dim', type=int, default=100, help='number of dimensions of generator input vector')
     parser.add_argument('--batch-size', type=int, default=128)
     parser.add_argument('--embedding-dim', type=int, default=128, help='number of dimensions of embedding vector')
+    parser.add_argument('--noise-factor', type=float, default=0.5, help='factor to scale added noise')
     parser.add_argument('--lr', type=float, default=0.0002, help='learning rate')
     parser.add_argument('--beta1', type=float, default=0.5, help='Adam optimizer beta1')
     parser.add_argument('--epochs', type=int, default=20)
@@ -58,14 +59,14 @@ def main():
 
             # train discriminator
             discriminator.zero_grad()
-            real_out = discriminator(x, labels).view(-1)
+            real_out = discriminator(x + torch.rand_like(x) * 0.1 * args.noise_factor, labels).view(-1)
             real_loss = criterion(real_out, torch.ones_like(real_out))
             real_loss.backward()
             disc_loss_obj += real_loss.item()
 
             random_noise = torch.randn(x.shape[0], args.input_dim).to(device)
             fake = generator(random_noise, labels)
-            fake_out = discriminator(fake.detach(), labels).view(-1)
+            fake_out = discriminator(fake.detach() + torch.rand_like(x) * 0.1 * args.noise_factor, labels).view(-1)
             fake_loss = criterion(fake_out, torch.zeros_like(fake_out))
             fake_loss.backward()
             disc_loss_obj += fake_loss.item()
@@ -73,7 +74,7 @@ def main():
 
             # train generator
             generator.zero_grad()
-            fake_out = discriminator(fake, labels).view(-1)
+            fake_out = discriminator(fake + torch.rand_like(x) * 0.1 * args.noise_factor, labels).view(-1)
             gen_loss = criterion(fake_out, torch.ones_like(fake_out))
             gen_loss.backward()
             gen_loss_obj += gen_loss.item()
