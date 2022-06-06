@@ -24,7 +24,7 @@ class Discriminator(nn.Module):
                 nn.LeakyReLU(0.2)
             ))
         self.conv_modules = nn.Sequential(*conv_modules)
-        self.fc = nn.Sequential(
+        self.final_layer = nn.Sequential(
             nn.Conv2d(hidden_dims[-1], 1, kernel_size=4, stride=1, padding=0, bias=False),
             nn.Sigmoid()
         )
@@ -40,8 +40,8 @@ class Discriminator(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Takes an image and returns a probability of being real.
+        Takes an image and returns the probability of being real.
         """
         x = self.conv_modules(x)
-        x = self.fc(x)
+        x = self.final_layer(x)
         return x
