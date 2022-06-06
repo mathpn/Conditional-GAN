@@ -52,7 +52,7 @@ class CondGenerator(nn.Module):
 
     def __init__(
             self, input_dim: int, embedding_size: int, embedding_dim: int,
-            hidden_dims: List[int] = [512, 256, 128, 64]):
+            hidden_dims: List[int] = [512, 256, 128, 64], dropout: float = 0.5):
         super().__init__()
         conv_modules = []
         hidden_dims = [input_dim + embedding_dim] + hidden_dims + [3] # 3 channels output
@@ -73,6 +73,7 @@ class CondGenerator(nn.Module):
         ))
         self.conv_modules = nn.Sequential(*conv_modules)
         self.embedding = nn.Embedding(embedding_size, embedding_dim)
+        self.dropout = nn.Dropout(dropout)
         self._init_weights()
 
     def _init_weights(self):
@@ -88,6 +89,7 @@ class CondGenerator(nn.Module):
         Generates an image from a noise vector and category labels.
         """
         embedding = self.embedding(labels)
+        embedding = self.dropout(embedding)
         z = torch.cat([z, embedding], dim=1)
         z = z.view(z.size(0), z.size(1), 1, 1)
         return self.conv_modules(z)
