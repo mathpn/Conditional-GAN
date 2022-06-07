@@ -28,3 +28,6 @@ Sampled images throughout training epochs:
 <p align="center">
     <img src="assets/condgan_epochs.gif" width="512"\>
 </p>
+
+### Conclusion
+For the conditional GAN GIF image, each column was sampled from the same random category. We can see that sampled images from the same category share common characteristics. However, training with conditional GAN was less stable towards the end, and vanilla GAN produced images that may be even considered better. It's important to note that both models trained for 40 epochs only in a (fairly) small dataset, so it's likely that there's model capacity still unused due to insufficient training.
