@@ -9,6 +9,11 @@ Thus, the goal here is simply to experiment with GANs using the [102 flowers dat
 
 We start first with a vanilla GAN. Its generator takes a 64-dimensional vector sampled from a gaussian distribution. The Adam optimizer is used throughout with a batch size of 128. GANs are known to present a few [training issues](https://developers.google.com/machine-learning/gan/problems). I've observed partial mode collapse, which was tackled by adding a small gaussian noise to all discriminator inputs.
 
+Sampled images throughout training epochs:
+
+<p align="center">
+    <img src="assets/gan_epochs.gif" width="512"\>
+</p>
 
 ## Conditional GAN
 
@@ -17,3 +22,9 @@ Since our dataset is labeled, we may use [Conditional GANs](https://arxiv.org/ab
 The idea is to provide a learnable vector to represent the prototypical image of each class, helping both the generator and the discriminator to get better at their jobs. This might potentially lead to more photorealistic images.
 
 One issue was that the generator relied too heavily on the embedding vector, which resulted in partial mode collapse: all outputs for a given label looked almost identical. To prevent this, a 0.5 probability dropout was added to the generator embedding.
+
+Sampled images throughout training epochs:
+
+<p align="center">
+    <img src="assets/condgan_epochs.gif" width="512"\>
+</p>
